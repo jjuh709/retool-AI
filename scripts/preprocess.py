@@ -1,19 +1,50 @@
 import pandas as pd
+import os
 
-# Load datasets
-location_data = pd.read_csv('data/location_data.csv')
-infrastructure_data = pd.read_csv('data/infrastructure_data.csv')
-zoning_data = pd.read_csv('data/zoning_data.csv')
-amenities_data = pd.read_csv('data/amenities_data.csv')
-environmental_data = pd.read_csv('data/environmental_data.csv')
-market_data = pd.read_csv('data/market_data.csv')
+# Debugging: Explicitly set working directory
+os.chdir('/workspaces/retool-AI')  # Adjust if needed
+print("Current Working Directory:", os.getcwd())
 
-# Merge datasets
-merged_data = pd.merge(location_data, infrastructure_data, on='land_id')
-merged_data = pd.merge(merged_data, zoning_data, on='land_id')
-merged_data = pd.merge(merged_data, amenities_data, on='land_id')
+# File path for environmental data
+file_path = 'data/environmental_data.csv'
+
+# Check if file exists and is readable
+if not os.path.exists(file_path):
+    raise FileNotFoundError(f"File not found: {os.path.abspath(file_path)}")
+if not os.access(file_path, os.R_OK):
+    raise PermissionError(f"Cannot read file: {os.path.abspath(file_path)}")
+
+# Load environmental data with error handling
+try:
+    environmental_data = pd.read_csv(file_path)
+    if environmental_data.empty:
+        raise ValueError("The file is empty.")
+except pd.errors.EmptyDataError:
+    raise ValueError("The file is empty or improperly formatted.")
+except Exception as e:
+    raise RuntimeError(f"An unexpected error occurred while loading the file: {e}")
+
+print("Environmental data loaded successfully:")
+print(environmental_data.head())
+
+# Load and merge other datasets
+datasets = ['location_data', 'infrastructure_data', 'zoning_data', 'amenities_data', 'market_data']
+dataframes = {}
+
+# Load datasets dynamically
+for dataset in datasets:
+    path = f"data/{dataset}.csv"
+    if not os.path.exists(path):
+        raise FileNotFoundError(f"File not found: {os.path.abspath(path)}")
+    dataframes[dataset] = pd.read_csv(path)
+
+# Merge datasets on 'land_id'
+merged_data = dataframes['location_data']
+for dataset in datasets[1:]:
+    merged_data = pd.merge(merged_data, dataframes[dataset], on='land_id')
+
+# Add environmental data
 merged_data = pd.merge(merged_data, environmental_data, on='land_id')
-merged_data = pd.merge(merged_data, market_data, on='land_id')
 
 # Feature engineering
 city_center_lat, city_center_lon = 34.05, -118.25  # Example coordinates
@@ -22,4 +53,6 @@ merged_data['distance_to_city_center'] = ((merged_data['latitude'] - city_center
 merged_data['soil_quality'] = merged_data['soil_quality'].map({'Poor': 0, 'Fair': 1, 'Good': 2})
 
 # Save merged data
-merged_data.to_csv('data/land_price_data.csv', index=False)
+output_path = 'data/land_price_data.csv'
+merged_data.to_csv(output_path, index=False)
+print(f"Merged data saved to {os.path.abspath(output_path)}")

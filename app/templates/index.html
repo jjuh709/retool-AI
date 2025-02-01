@@ -3,42 +3,274 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Land Cost Evaluation</title>
+    <title>Land Price Prediction</title>
+    <style>
+        /* Basic Reset */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: url('https://www.w3schools.com/w3images/forest.jpg') no-repeat center center fixed;
+            background-size: cover;
+            color: #fff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            overflow: hidden;
+            animation: fadeIn 2s ease-out;
+        }
+
+        /* Animations */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+
+        .container {
+            background-color: rgba(255, 255, 255, 0.8); /* Semi-transparent white */
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+            width: 80%;
+            max-width: 600px;
+            max-height: 80vh;  /* Limiting the height of the form */
+            overflow-y: auto; /* Enable scrolling */
+            transform: translateY(-100px);
+            animation: slideIn 1s ease-out forwards;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateY(-100px);
+            }
+            to {
+                transform: translateY(0);
+            }
+        }
+
+        h1 {
+            text-align: center;
+            color: #4CAF50;
+            margin-bottom: 20px;
+            font-size: 2em;
+            text-transform: uppercase;
+            font-weight: bold;
+            animation: bounce 1s infinite;
+        }
+
+        @keyframes bounce {
+            0%, 100% {
+                transform: translateY(0);
+            }
+            50% {
+                transform: translateY(-10px);
+            }
+        }
+
+        label {
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 8px;
+            display: inline-block;
+            color: #333;
+        }
+
+        input {
+            width: 100%;
+            padding: 12px;
+            margin: 10px 0;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 14px;
+            color: #333;
+            background-color: #fafafa;
+            box-sizing: border-box;
+            transition: all 0.3s ease-in-out;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: #4CAF50;
+            background-color: #e1f7e1;
+        }
+
+        button {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            padding: 15px 25px;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 15px;
+            transition: background-color 0.3s ease;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+
+        #result {
+            margin-top: 20px;
+            padding: 12px;
+            background-color: #e8f5e9;
+            border-radius: 8px;
+            color: #4CAF50;
+            font-weight: bold;
+            text-align: center;
+            font-size: 18px;
+            animation: fadeIn 2s ease-in-out;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .input-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .input-group input {
+            width: 100%;
+        }
+    </style>
 </head>
 <body>
-    <h1>Land Cost Evaluation</h1>
-    <form id="predictionForm">
-        <label for="latitude">Latitude:</label>
-        <input type="text" id="latitude" name="latitude" required><br><br>
-        <label for="longitude">Longitude:</label>
-        <input type="text" id="longitude" name="longitude" required><br><br>
-        <label for="soil_quality">Soil Quality:</label>
-        <input type="text" id="soil_quality" name="soil_quality" required><br><br>
-        <label for="distance_to_city_center">Distance to City Center:</label>
-        <input type="text" id="distance_to_city_center" name="distance_to_city_center" required><br><br>
-        <button type="submit">Predict</button>
-    </form>
-    <h2 id="predictionResult"></h2>
+
+    <div class="container">
+        <h1>Land Price Prediction</h1>
+
+        <form id="predictionForm">
+            <div class="form-group">
+                <label for="latitude">Latitude:</label>
+                <input type="text" id="latitude" name="latitude" required>
+            </div>
+
+            <div class="form-group">
+                <label for="longitude">Longitude:</label>
+                <input type="text" id="longitude" name="longitude" required>
+            </div>
+
+            <div class="form-group">
+                <label for="roads">Roads (0/1):</label>
+                <input type="number" id="roads" name="roads" required>
+            </div>
+
+            <div class="form-group">
+                <label for="electricity">Electricity (0/1):</label>
+                <input type="number" id="electricity" name="electricity" required>
+            </div>
+
+            <div class="form-group">
+                <label for="water">Water (0/1):</label>
+                <input type="number" id="water" name="water" required>
+            </div>
+
+            <div class="form-group">
+                <label for="sewage">Sewage (0/1):</label>
+                <input type="number" id="sewage" name="sewage" required>
+            </div>
+
+            <div class="form-group">
+                <label for="land_use">Land Use:</label>
+                <input type="text" id="land_use" name="land_use" required>
+            </div>
+
+            <div class="form-group">
+                <label for="schools">Schools:</label>
+                <input type="number" id="schools" name="schools" required>
+            </div>
+
+            <div class="form-group">
+                <label for="hospitals">Hospitals:</label>
+                <input type="number" id="hospitals" name="hospitals" required>
+            </div>
+
+            <div class="form-group">
+                <label for="parks">Parks:</label>
+                <input type="number" id="parks" name="parks" required>
+            </div>
+
+            <div class="form-group">
+                <label for="soil_quality">Soil Quality:</label>
+                <input type="text" id="soil_quality" name="soil_quality" required>
+            </div>
+
+            <div class="form-group">
+                <label for="elevation_x">Elevation (X):</label>
+                <input type="number" id="elevation_x" name="elevation_x" required>
+            </div>
+
+            <div class="form-group">
+                <label for="flood_risk_x">Flood Risk (X):</label>
+                <input type="text" id="flood_risk_x" name="flood_risk_x" required>
+            </div>
+
+            <div class="form-group">
+                <label for="env_soil_quality">Environmental Soil Quality:</label>
+                <input type="number" id="env_soil_quality" name="env_soil_quality" required>
+            </div>
+
+            <div class="form-group">
+                <label for="elevation_y">Elevation (Y):</label>
+                <input type="number" id="elevation_y" name="elevation_y" required>
+            </div>
+
+            <div class="form-group">
+                <label for="flood_risk_y">Flood Risk (Y):</label>
+                <input type="text" id="flood_risk_y" name="flood_risk_y" required>
+            </div>
+
+            <div class="form-group">
+                <label for="distance_to_city_center">Distance to City Center (km):</label>
+                <input type="number" id="distance_to_city_center" name="distance_to_city_center" required>
+            </div>
+
+            <button type="button" onclick="sendRequest()">Predict Land Price</button>
+        </form>
+
+        <div id="result"></div>
+    </div>
 
     <script>
-        document.getElementById('predictionForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const formData = {
-                latitude: parseFloat(document.getElementById('latitude').value),
-                longitude: parseFloat(document.getElementById('longitude').value),
-                soil_quality: parseInt(document.getElementById('soil_quality').value),
-                distance_to_city_center: parseFloat(document.getElementById('distance_to_city_center').value),
-            };
+        function sendRequest() {
+            // Get form values
+            const formData = new FormData(document.getElementById("predictionForm"));
+            const data = {};
 
-            const response = await fetch('/predict', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify([formData]),
+            formData.forEach((value, key) => {
+                data[key] = value;
             });
 
-            const result = await response.json();
-            document.getElementById('predictionResult').innerText = `Predicted Land Price: $${result.prediction[0].toFixed(2)}`;
-        });
+            // Send POST request to Flask API
+            fetch('http://<YOUR_CODESCAPES_URL>:5000/predict', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify([data])
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log('Prediction:', data.prediction);
+                document.getElementById("result").innerHTML = 'Predicted Land Price: ' + data.prediction;
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+        }
     </script>
+
 </body>
 </html>
